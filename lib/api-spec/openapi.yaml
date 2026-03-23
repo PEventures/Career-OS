@@ -1,22 +1,40 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Standout Manager API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: onboarding
+    description: Onboarding operations
+  - name: assessments
+    description: Assessment operations
+  - name: scenarios
+    description: Scenario operations
+  - name: systems
+    description: Systems/Playbooks operations
+  - name: coach
+    description: AI Coach operations
+  - name: journey
+    description: Journey/Progress operations
+  - name: brand
+    description: Brand Lab operations
+  - name: admin
+    description: Admin operations
+  - name: openai
+    description: OpenAI chat operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +42,591 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /onboarding:
+    post:
+      operationId: submitOnboarding
+      tags: [onboarding]
+      summary: Submit onboarding data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OnboardingBody"
+      responses:
+        "200":
+          description: Onboarding complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /assessments:
+    get:
+      operationId: listAssessments
+      tags: [assessments]
+      summary: List all assessments
+      responses:
+        "200":
+          description: List of assessments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Assessment"
+
+  /assessments/{id}:
+    get:
+      operationId: getAssessment
+      tags: [assessments]
+      summary: Get assessment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Assessment detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assessment"
+
+  /assessments/{id}/submit:
+    post:
+      operationId: submitAssessment
+      tags: [assessments]
+      summary: Submit assessment answers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssessmentSubmitBody"
+      responses:
+        "200":
+          description: Assessment results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
+
+  /assessments/results:
+    get:
+      operationId: getAssessmentResults
+      tags: [assessments]
+      summary: Get user's assessment results
+      responses:
+        "200":
+          description: User assessment results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssessmentResult"
+
+  /scenarios:
+    get:
+      operationId: listScenarios
+      tags: [scenarios]
+      summary: List scenarios
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of scenarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Scenario"
+
+  /scenarios/{id}:
+    get:
+      operationId: getScenario
+      tags: [scenarios]
+      summary: Get scenario by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Scenario detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scenario"
+
+  /scenarios/{id}/complete:
+    post:
+      operationId: completeScenario
+      tags: [scenarios]
+      summary: Complete a scenario with chosen response
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteScenarioBody"
+      responses:
+        "200":
+          description: Scenario completion result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScenarioResult"
+
+  /systems:
+    get:
+      operationId: listSystems
+      tags: [systems]
+      summary: List management systems/playbooks
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of systems
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/System"
+
+  /systems/{id}:
+    get:
+      operationId: getSystem
+      tags: [systems]
+      summary: Get system by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: System detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/System"
+
+  /journey:
+    get:
+      operationId: getJourney
+      tags: [journey]
+      summary: Get user journey and progress
+      responses:
+        "200":
+          description: User journey
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Journey"
+
+  /journey/checkin:
+    post:
+      operationId: submitCheckin
+      tags: [journey]
+      summary: Submit daily check-in or habit completion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckinBody"
+      responses:
+        "200":
+          description: Check-in submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /brand:
+    get:
+      operationId: getBrandProfile
+      tags: [brand]
+      summary: Get user's brand profile
+      responses:
+        "200":
+          description: Brand profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrandProfile"
+    put:
+      operationId: updateBrandProfile
+      tags: [brand]
+      summary: Update brand profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BrandProfileBody"
+      responses:
+        "200":
+          description: Updated brand profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrandProfile"
+
+  /brand/reflections:
+    get:
+      operationId: getBrandReflections
+      tags: [brand]
+      summary: Get brand reflection prompts
+      responses:
+        "200":
+          description: Reflection prompts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReflectionPrompt"
+    post:
+      operationId: submitReflection
+      tags: [brand]
+      summary: Submit a reflection response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReflectionBody"
+      responses:
+        "200":
+          description: Reflection saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [auth]
+      summary: Get user dashboard stats
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+
+  /admin/scenarios:
+    get:
+      operationId: adminListScenarios
+      tags: [admin]
+      summary: Admin list all scenarios
+      responses:
+        "200":
+          description: All scenarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Scenario"
+    post:
+      operationId: adminCreateScenario
+      tags: [admin]
+      summary: Admin create scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioBody"
+      responses:
+        "201":
+          description: Created scenario
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scenario"
+
+  /admin/scenarios/{id}:
+    put:
+      operationId: adminUpdateScenario
+      tags: [admin]
+      summary: Admin update scenario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioBody"
+      responses:
+        "200":
+          description: Updated scenario
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scenario"
+    delete:
+      operationId: adminDeleteScenario
+      tags: [admin]
+      summary: Admin delete scenario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/systems:
+    get:
+      operationId: adminListSystems
+      tags: [admin]
+      summary: Admin list all systems
+      responses:
+        "200":
+          description: All systems
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/System"
+    post:
+      operationId: adminCreateSystem
+      tags: [admin]
+      summary: Admin create system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SystemBody"
+      responses:
+        "201":
+          description: Created system
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/System"
+
+  /admin/analytics:
+    get:
+      operationId: adminGetAnalytics
+      tags: [admin]
+      summary: Get product analytics
+      responses:
+        "200":
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analytics"
+
+  /openai/conversations:
+    get:
+      operationId: listOpenaiConversations
+      tags: [openai]
+      summary: List user AI coach conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpenaiConversation"
+    post:
+      operationId: createOpenaiConversation
+      tags: [openai]
+      summary: Create a new AI coach conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOpenaiConversationBody"
+      responses:
+        "201":
+          description: Conversation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversation"
+
+  /openai/conversations/{id}:
+    get:
+      operationId: getOpenaiConversation
+      tags: [openai]
+      summary: Get a conversation with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpenaiConversationWithMessages"
+
+  /openai/conversations/{id}/messages:
+    post:
+      operationId: sendOpenaiMessage
+      tags: [openai]
+      summary: Send message to AI coach (streaming SSE)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendOpenaiMessageBody"
+      responses:
+        "200":
+          description: Streaming SSE response
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +634,713 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        tier:
+          type: string
+          enum: [free, core, premium]
+        onboardingCompleted:
+          type: boolean
+        createdAt:
+          type: string
+      required: [id, email, role, tier, onboardingCompleted, createdAt]
+
+    RegisterBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+      required: [email, password, name]
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required: [email, password]
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required: [user, token]
+
+    OnboardingBody:
+      type: object
+      properties:
+        roleType:
+          type: string
+          enum: [first_time_manager, individual_contributor]
+        yearsExperience:
+          type: string
+        teamSize:
+          type: string
+        industry:
+          type: string
+        biggestChallenge:
+          type: string
+        confidenceLevel:
+          type: integer
+          minimum: 1
+          maximum: 10
+        fearAreas:
+          type: array
+          items:
+            type: string
+        desiredReputation:
+          type: array
+          items:
+            type: string
+      required: [roleType, yearsExperience, teamSize, industry, biggestChallenge, confidenceLevel, fearAreas, desiredReputation]
+
+    Assessment:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        estimatedMinutes:
+          type: integer
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssessmentQuestion"
+        isCompleted:
+          type: boolean
+        completedAt:
+          type: string
+          nullable: true
+        score:
+          type: number
+          nullable: true
+      required: [id, title, description, category, estimatedMinutes, questions, isCompleted]
+
+    AssessmentQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssessmentOption"
+        type:
+          type: string
+          enum: [single, scale, multi]
+      required: [id, text, options, type]
+
+    AssessmentOption:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        value:
+          type: integer
+      required: [id, text, value]
+
+    AssessmentSubmitBody:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: string
+              selectedOptionId:
+                type: string
+              value:
+                type: integer
+            required: [questionId]
+      required: [answers]
+
+    AssessmentResult:
+      type: object
+      properties:
+        id:
+          type: string
+        assessmentId:
+          type: string
+        assessmentTitle:
+          type: string
+        score:
+          type: number
+        scoreLabel:
+          type: string
+        completedAt:
+          type: string
+        strengths:
+          type: array
+          items:
+            type: string
+        blindSpots:
+          type: array
+          items:
+            type: string
+        recommendations:
+          type: array
+          items:
+            type: string
+        breakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              score:
+                type: number
+              label:
+                type: string
+            required: [category, score, label]
+      required: [id, assessmentId, assessmentTitle, score, scoreLabel, completedAt, strengths, blindSpots, recommendations, breakdown]
+
+    Scenario:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        situation:
+          type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        estimatedMinutes:
+          type: integer
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScenarioOption"
+        tags:
+          type: array
+          items:
+            type: string
+        isCompleted:
+          type: boolean
+        userScore:
+          type: integer
+          nullable: true
+        isPremium:
+          type: boolean
+      required: [id, title, description, situation, category, difficulty, estimatedMinutes, options, tags, isCompleted, isPremium]
+
+    ScenarioOption:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        quality:
+          type: string
+          enum: [strong, acceptable, weak, risky]
+        explanation:
+          type: string
+        brandImpact:
+          type: string
+        score:
+          type: integer
+      required: [id, text, quality, explanation, brandImpact, score]
+
+    CompleteScenarioBody:
+      type: object
+      properties:
+        selectedOptionId:
+          type: string
+      required: [selectedOptionId]
+
+    ScenarioResult:
+      type: object
+      properties:
+        scenarioId:
+          type: string
+        selectedOption:
+          $ref: "#/components/schemas/ScenarioOption"
+        score:
+          type: integer
+        feedback:
+          type: string
+        keyLesson:
+          type: string
+        brandImpactSummary:
+          type: string
+      required: [scenarioId, selectedOption, score, feedback, keyLesson, brandImpactSummary]
+
+    ScenarioBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        situation:
+          type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        estimatedMinutes:
+          type: integer
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScenarioOption"
+        tags:
+          type: array
+          items:
+            type: string
+        isPremium:
+          type: boolean
+      required: [title, description, situation, category, difficulty, estimatedMinutes, options, tags, isPremium]
+
+    System:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/SystemStep"
+        keyPrinciples:
+          type: array
+          items:
+            type: string
+        scripts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SystemScript"
+        estimatedMinutes:
+          type: integer
+        isPremium:
+          type: boolean
+      required: [id, title, description, category, steps, keyPrinciples, scripts, estimatedMinutes, isPremium]
+
+    SystemStep:
+      type: object
+      properties:
+        order:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+      required: [order, title, description]
+
+    SystemScript:
+      type: object
+      properties:
+        tone:
+          type: string
+        text:
+          type: string
+      required: [tone, text]
+
+    SystemBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/SystemStep"
+        keyPrinciples:
+          type: array
+          items:
+            type: string
+        scripts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SystemScript"
+        estimatedMinutes:
+          type: integer
+        isPremium:
+          type: boolean
+      required: [title, description, category, steps, keyPrinciples, scripts, estimatedMinutes, isPremium]
+
+    Journey:
+      type: object
+      properties:
+        currentDay:
+          type: integer
+        totalDays:
+          type: integer
+        currentPath:
+          type: string
+        streakDays:
+          type: integer
+        completedActions:
+          type: integer
+        totalActions:
+          type: integer
+        milestones:
+          type: array
+          items:
+            $ref: "#/components/schemas/Milestone"
+        weeklyActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/JourneyAction"
+        reflectionPrompts:
+          type: array
+          items:
+            type: string
+      required: [currentDay, totalDays, currentPath, streakDays, completedActions, totalActions, milestones, weeklyActions, reflectionPrompts]
+
+    Milestone:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        isCompleted:
+          type: boolean
+        completedAt:
+          type: string
+          nullable: true
+        dayTarget:
+          type: integer
+      required: [id, title, description, isCompleted, dayTarget]
+
+    JourneyAction:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [scenario, system, reflection, habit, assessment]
+        isCompleted:
+          type: boolean
+        completedAt:
+          type: string
+          nullable: true
+        day:
+          type: integer
+      required: [id, title, description, type, isCompleted, day]
+
+    CheckinBody:
+      type: object
+      properties:
+        actionId:
+          type: string
+        reflectionText:
+          type: string
+      required: [actionId]
+
+    BrandProfile:
+      type: object
+      properties:
+        desiredIdentity:
+          type: array
+          items:
+            type: string
+        currentPerceptions:
+          type: array
+          items:
+            type: string
+        brandScore:
+          type: number
+        gapAreas:
+          type: array
+          items:
+            type: string
+        strengths:
+          type: array
+          items:
+            type: string
+        habits:
+          type: array
+          items:
+            $ref: "#/components/schemas/BrandHabit"
+        lastUpdated:
+          type: string
+          nullable: true
+      required: [desiredIdentity, currentPerceptions, brandScore, gapAreas, strengths, habits]
+
+    BrandHabit:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        isActive:
+          type: boolean
+        streakDays:
+          type: integer
+      required: [id, title, description, isActive, streakDays]
+
+    BrandProfileBody:
+      type: object
+      properties:
+        desiredIdentity:
+          type: array
+          items:
+            type: string
+        currentPerceptions:
+          type: array
+          items:
+            type: string
+        habitIds:
+          type: array
+          items:
+            type: string
+
+    ReflectionPrompt:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        category:
+          type: string
+        isAnswered:
+          type: boolean
+        answer:
+          type: string
+          nullable: true
+      required: [id, text, category, isAnswered]
+
+    ReflectionBody:
+      type: object
+      properties:
+        promptId:
+          type: string
+        answer:
+          type: string
+      required: [promptId, answer]
+
+    Dashboard:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        assessmentProgress:
+          type: object
+          properties:
+            completed:
+              type: integer
+            total:
+              type: integer
+            averageScore:
+              type: number
+          required: [completed, total, averageScore]
+        scenariosProgress:
+          type: object
+          properties:
+            completed:
+              type: integer
+            total:
+              type: integer
+            averageScore:
+              type: number
+          required: [completed, total, averageScore]
+        journeyProgress:
+          type: object
+          properties:
+            currentDay:
+              type: integer
+            streakDays:
+              type: integer
+            completedActions:
+              type: integer
+          required: [currentDay, streakDays, completedActions]
+        brandScore:
+          type: number
+        coachUsageCount:
+          type: integer
+        recentActivity:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              title:
+                type: string
+              completedAt:
+                type: string
+            required: [type, title, completedAt]
+        topPriorityAreas:
+          type: array
+          items:
+            type: string
+      required: [user, assessmentProgress, scenariosProgress, journeyProgress, brandScore, coachUsageCount, recentActivity, topPriorityAreas]
+
+    Analytics:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        activeUsers:
+          type: integer
+        onboardingCompletionRate:
+          type: number
+        assessmentCompletionRate:
+          type: number
+        scenarioUsage:
+          type: integer
+        aiCoachUsage:
+          type: integer
+        topScenarioCategories:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              count:
+                type: integer
+            required: [category, count]
+        tierBreakdown:
+          type: object
+          properties:
+            free:
+              type: integer
+            core:
+              type: integer
+            premium:
+              type: integer
+          required: [free, core, premium]
+      required: [totalUsers, activeUsers, onboardingCompletionRate, assessmentCompletionRate, scenarioUsage, aiCoachUsage, topScenarioCategories, tierBreakdown]
+
+    OpenaiConversation:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        messageCount:
+          type: integer
+      required: [id, title, createdAt, updatedAt, messageCount]
+
+    OpenaiConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenaiMessage"
+      required: [id, title, createdAt, updatedAt, messages]
+
+    OpenaiMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        createdAt:
+          type: string
+      required: [id, role, content, createdAt]
+
+    CreateOpenaiConversationBody:
+      type: object
+      properties:
+        title:
+          type: string
+      required: [title]
+
+    SendOpenaiMessageBody:
+      type: object
+      properties:
+        content:
+          type: string
+        toneMode:
+          type: string
+          enum: [diplomatic, firm, executive_ready, empathetic, politically_careful]
+      required: [content]

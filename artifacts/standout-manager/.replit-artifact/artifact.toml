@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Standout Manager"
+version = "1.0.0"
+id = "artifacts/standout-manager"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18474
+
+[services.development]
+run = "pnpm --filter @workspace/standout-manager run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/standout-manager", "run", "build" ]
+publicDir = "artifacts/standout-manager/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18474"
+BASE_PATH = "/"
