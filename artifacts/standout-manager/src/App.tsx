@@ -62,29 +62,29 @@ function Router() {
       <Route path="/dashboard">
         {() => <ProtectedRoute component={() => <AppLayout><Dashboard /></AppLayout>} />}
       </Route>
+      <Route path="/assess/management-readiness">
+        {() => <ProtectedRoute component={() => <AppLayout><ManagementReadiness /></AppLayout>} />}
+      </Route>
       <Route path="/assess">
         {() => <ProtectedRoute component={() => <AppLayout><Assess /></AppLayout>} />}
-      </Route>
-      <Route path="/scenarios">
-        {() => <ProtectedRoute component={() => <AppLayout><Scenarios /></AppLayout>} />}
       </Route>
       <Route path="/scenarios/:id">
         {() => <ProtectedRoute component={() => <AppLayout><ScenarioDetail /></AppLayout>} />}
       </Route>
-      <Route path="/systems">
-        {() => <ProtectedRoute component={() => <AppLayout><Systems /></AppLayout>} />}
+      <Route path="/scenarios">
+        {() => <ProtectedRoute component={() => <AppLayout><Scenarios /></AppLayout>} />}
       </Route>
       <Route path="/systems/:id">
         {() => <ProtectedRoute component={() => <AppLayout><SystemDetail /></AppLayout>} />}
+      </Route>
+      <Route path="/systems">
+        {() => <ProtectedRoute component={() => <AppLayout><Systems /></AppLayout>} />}
       </Route>
       <Route path="/coach">
         {() => <ProtectedRoute component={() => <AppLayout><Coach /></AppLayout>} />}
       </Route>
       <Route path="/journey">
         {() => <ProtectedRoute component={() => <AppLayout><Journey /></AppLayout>} />}
-      </Route>
-      <Route path="/assess/management-readiness">
-        {() => <ProtectedRoute component={() => <AppLayout><ManagementReadiness /></AppLayout>} />}
       </Route>
       <Route path="/brand-lab">
         {() => <ProtectedRoute component={() => <AppLayout><BrandLab /></AppLayout>} />}
