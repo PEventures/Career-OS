@@ -18,6 +18,7 @@ import Journey from "@/pages/app/Journey";
 import Assess from "@/pages/app/Assess";
 import BrandLab from "@/pages/app/BrandLab";
 import SystemDetail from "@/pages/app/SystemDetail";
+import ManagementReadiness from "@/pages/app/ManagementReadiness";
 
 // Layout
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -81,6 +82,9 @@ function Router() {
       </Route>
       <Route path="/journey">
         {() => <ProtectedRoute component={() => <AppLayout><Journey /></AppLayout>} />}
+      </Route>
+      <Route path="/assess/management-readiness">
+        {() => <ProtectedRoute component={() => <AppLayout><ManagementReadiness /></AppLayout>} />}
       </Route>
       <Route path="/brand-lab">
         {() => <ProtectedRoute component={() => <AppLayout><BrandLab /></AppLayout>} />}

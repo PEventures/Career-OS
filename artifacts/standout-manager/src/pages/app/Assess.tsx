@@ -1,9 +1,10 @@
 import React from "react";
 import { useListAssessments, useGetAssessment } from "@workspace/api-client-react";
 import { Card, CardContent, Badge, Button, Progress } from "@/components/ui/shared";
-import { Target, Lock, ArrowRight, Clock, ChevronRight, CheckCircle2, AlertTriangle, TrendingUp, X, Timer } from "lucide-react";
+import { Target, Lock, ArrowRight, Clock, ChevronRight, CheckCircle2, AlertTriangle, TrendingUp, X, Timer, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getToken } from "@/lib/utils";
+import { Link } from "wouter";
 
 type AssessmentPhase = "list" | "taking" | "results";
 
@@ -357,18 +358,69 @@ export default function Assess() {
   }
 
   return (
-    <div className="space-y-8 pb-12 animate-fade-in">
+    <div className="space-y-10 pb-12 animate-fade-in">
       <div>
         <h1 className="text-3xl font-display font-bold text-foreground flex items-center gap-3">
           <Target className="w-8 h-8 text-primary" />
           Diagnostics
         </h1>
         <p className="text-muted-foreground mt-2 text-lg max-w-2xl">
-          Radical self-awareness is your biggest competitive advantage. Each test takes 9–11 minutes and gives you an honest read on where you stand.
+          Radical self-awareness is your biggest competitive advantage. Each test takes 9–12 minutes and gives you an honest read on where you stand.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Featured: Management Readiness */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Start Here</span>
+        </div>
+        <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-card relative overflow-hidden shadow-xl shadow-primary/5">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <CardContent className="p-8 md:p-10 relative z-10">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <Badge variant="premium" className="uppercase tracking-widest text-xs">Flagship Diagnostic</Badge>
+                  <Badge variant="outline" className="text-xs">Free</Badge>
+                </div>
+                <h2 className="text-3xl font-display font-bold mb-3">Management Readiness Diagnostic</h2>
+                <p className="text-muted-foreground leading-relaxed mb-6 text-lg max-w-xl">
+                  24 scenario-based questions across 8 dimensions. No score — just an honest gap map showing exactly where you stand and where to build first.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {["Competence", "Confidence", "Communication", "Presence", "Engagement", "Proactive vs Reactive", "Political Awareness", "Stakeholder Awareness"].map(dim => (
+                    <span key={dim} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/20">{dim}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> 9–12 minutes</span>
+                  <span>24 questions</span>
+                  <span>8 dimensions</span>
+                  <span>Gap analysis, not a score</span>
+                </div>
+              </div>
+              <div className="lg:flex-shrink-0">
+                <Link href="/assess/management-readiness">
+                  <Button variant="premium" size="lg" className="w-full lg:w-auto gap-3 text-base px-8 py-4 h-auto">
+                    Start Assessment
+                    <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </Link>
+                <p className="text-xs text-muted-foreground text-center mt-3">Takes 9–12 min to complete</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Other Assessments */}
+      {displayData.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-sm font-bold uppercase tracking-wider text-muted-foreground">More Diagnostics</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {displayData.map((assessment: any) => (
           <Card key={assessment.id} className="flex flex-col relative overflow-hidden border-white/10 hover:border-primary/30 transition-colors">
             <CardContent className="p-8 flex flex-col h-full">
@@ -419,7 +471,9 @@ export default function Assess() {
             </CardContent>
           </Card>
         ))}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

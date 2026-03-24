@@ -71,6 +71,63 @@ router.get("/:id", requireAuth, async (req: any, res) => {
   });
 });
 
+router.post("/management-readiness/submit", requireAuth, async (req: any, res) => {
+  const { answers, dimensionResults } = req.body;
+  if (!dimensionResults || !Array.isArray(dimensionResults)) {
+    return res.status(400).json({ error: "dimensionResults required" });
+  }
+
+  const ASSESSMENT_ID = "management-readiness-v1";
+
+  // Ensure the assessment row exists
+  const [existing] = await db.select().from(assessmentsTable).where(eq(assessmentsTable.id, ASSESSMENT_ID));
+  if (!existing) {
+    await db.insert(assessmentsTable).values({
+      id: ASSESSMENT_ID,
+      title: "Management Readiness Diagnostic",
+      description: "An 8-dimension gap assessment for new and aspiring managers.",
+      category: "management_readiness",
+      estimatedMinutes: 10,
+      questions: [],
+    }).onConflictDoNothing();
+  }
+
+  const breakdown = dimensionResults.map((d: any) => ({
+    category: d.label,
+    score: d.avgWeight * 25,
+    label: d.level,
+  }));
+
+  const gapDimensions = dimensionResults
+    .filter((d: any) => d.level === "early" || d.level === "developing")
+    .map((d: any) => d.label);
+
+  const strengthDimensions = dimensionResults
+    .filter((d: any) => d.level === "strong" || d.level === "capable")
+    .map((d: any) => d.label);
+
+  // Delete any previous result for this user+assessment, then insert fresh
+  await db.delete(assessmentResultsTable).where(
+    and(
+      eq(assessmentResultsTable.userId, req.user.id),
+      eq(assessmentResultsTable.assessmentId, ASSESSMENT_ID)
+    )
+  );
+
+  await db.insert(assessmentResultsTable).values({
+    userId: req.user.id,
+    assessmentId: ASSESSMENT_ID,
+    answers: answers || [],
+    score: 0,
+    strengths: strengthDimensions,
+    blindSpots: gapDimensions,
+    recommendations: [],
+    breakdown,
+  });
+
+  res.json({ success: true, gaps: gapDimensions, strengths: strengthDimensions });
+});
+
 router.post("/:id/submit", requireAuth, async (req: any, res) => {
   const [assessment] = await db.select().from(assessmentsTable).where(eq(assessmentsTable.id, req.params.id));
   if (!assessment) return res.status(404).json({ error: "Not found" });
