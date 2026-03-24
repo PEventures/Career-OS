@@ -10,7 +10,8 @@ import {
   LogOut, 
   Menu,
   X,
-  ShieldAlert
+  ShieldAlert,
+  Zap
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/shared";
@@ -18,11 +19,11 @@ import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Journey", href: "/journey", icon: Sparkles },
   { name: "Assess", href: "/assess", icon: Target },
   { name: "Scenarios", href: "/scenarios", icon: Compass },
   { name: "Systems", href: "/systems", icon: BookOpen },
   { name: "Coach", href: "/coach", icon: MessageSquare },
-  { name: "Journey", href: "/journey", icon: Sparkles },
   { name: "Brand Lab", href: "/brand-lab", icon: ShieldAlert },
 ];
 
@@ -63,6 +64,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+        {/* Upgrade CTA */}
+        <div className="px-4 pb-2">
+          <Link href="/pricing">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-primary/10 to-amber-600/10 border border-primary/20 hover:border-primary/40 transition-all cursor-pointer group">
+              <Zap className="w-4 h-4 text-primary flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-primary">Upgrade to Pro</p>
+                <p className="text-[10px] text-muted-foreground truncate">Use code FREE26 for full access</p>
+              </div>
+            </div>
+          </Link>
+        </div>
         <div className="p-4 border-t border-white/5">
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 mb-2">
             <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-sm font-bold border border-white/10">
