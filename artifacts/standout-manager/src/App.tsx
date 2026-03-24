@@ -17,6 +17,7 @@ import Coach from "@/pages/app/Coach";
 import Journey from "@/pages/app/Journey";
 import Assess from "@/pages/app/Assess";
 import BrandLab from "@/pages/app/BrandLab";
+import SystemDetail from "@/pages/app/SystemDetail";
 
 // Layout
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -71,6 +72,9 @@ function Router() {
       </Route>
       <Route path="/systems">
         {() => <ProtectedRoute component={() => <AppLayout><Systems /></AppLayout>} />}
+      </Route>
+      <Route path="/systems/:id">
+        {() => <ProtectedRoute component={() => <AppLayout><SystemDetail /></AppLayout>} />}
       </Route>
       <Route path="/coach">
         {() => <ProtectedRoute component={() => <AppLayout><Coach /></AppLayout>} />}
