@@ -1,10 +1,12 @@
 import React from "react";
 import { useListAssessments, useGetAssessment } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, Badge, Button, Progress } from "@/components/ui/shared";
-import { Target, Lock, ArrowRight, Clock, ChevronRight, CheckCircle2, AlertTriangle, TrendingUp, X, Timer, Sparkles } from "lucide-react";
+import { Target, Lock, ArrowRight, Clock, ChevronRight, CheckCircle2, AlertTriangle, TrendingUp, X, Timer, Sparkles, SaveAll } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getToken } from "@/lib/utils";
 import { Link } from "wouter";
+import { UpgradeModal } from "@/components/ui/UpgradeModal";
 
 type AssessmentPhase = "list" | "taking" | "results";
 
@@ -329,20 +331,31 @@ function ResultsView({ result, onRetake, onBack }: { result: Result; onRetake: (
 
 export default function Assess() {
   const { data: assessments, isLoading, refetch } = useListAssessments();
+  const queryClient = useQueryClient();
   const [phase, setPhase] = React.useState<AssessmentPhase>("list");
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [result, setResult] = React.useState<Result | null>(null);
+  const [upgradeTarget, setUpgradeTarget] = React.useState<{ name: string; description: string } | null>(null);
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading assessments...</div>;
 
   const displayData = (assessments as any[]) || [];
+
+  const handleComplete = (res: Result) => {
+    setResult(res);
+    setPhase("results");
+    // Immediately update all related queries so dashboard + listing reflect this completion
+    refetch();
+    queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/journey"] });
+  };
 
   if (phase === "taking" && activeId) {
     return (
       <AssessmentTaker
         assessmentId={activeId}
         onClose={() => { setPhase("list"); setActiveId(null); }}
-        onComplete={(res) => { setResult(res); setPhase("results"); }}
+        onComplete={handleComplete}
       />
     );
   }
@@ -462,9 +475,15 @@ export default function Assess() {
                   <Button
                     variant="premium"
                     size="sm"
-                    onClick={() => { setActiveId(assessment.id); setPhase("taking"); }}
+                    onClick={() => {
+                      if (assessment.isPremium) {
+                        setUpgradeTarget({ name: assessment.title, description: assessment.description });
+                      } else {
+                        setActiveId(assessment.id); setPhase("taking");
+                      }
+                    }}
                   >
-                    Start Test <ArrowRight className="w-4 h-4 ml-2" />
+                    {assessment.isPremium ? <><Lock className="w-3.5 h-3.5 mr-1" /> Unlock</> : <>Start Test <ArrowRight className="w-4 h-4 ml-2" /></>}
                   </Button>
                 </div>
               )}
@@ -473,6 +492,14 @@ export default function Assess() {
         ))}
           </div>
         </div>
+      )}
+
+      {upgradeTarget && (
+        <UpgradeModal
+          onClose={() => setUpgradeTarget(null)}
+          featureName={upgradeTarget.name}
+          featureDescription={upgradeTarget.description}
+        />
       )}
     </div>
   );

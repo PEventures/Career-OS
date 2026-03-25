@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   DIMENSIONS,
   ALL_QUESTIONS,
@@ -11,7 +12,7 @@ import {
   ASSESSMENT_ID,
 } from "@/data/management-readiness";
 import { Card, CardContent, Badge, Button } from "@/components/ui/shared";
-import { ArrowLeft, ChevronRight, Timer, X, CheckCircle2, ArrowRight, Sparkles, AlertTriangle, TrendingUp } from "lucide-react";
+import { ArrowLeft, ChevronRight, Timer, X, CheckCircle2, ArrowRight, Sparkles, AlertTriangle, TrendingUp, SaveAll } from "lucide-react";
 import { cn, getToken } from "@/lib/utils";
 
 type Phase = "intro" | "taking" | "results";
@@ -468,9 +469,11 @@ function GapResults({
 
 /* ─── Main Orchestrator ────────────────────────────────────────────────── */
 export default function ManagementReadiness() {
+  const queryClient = useQueryClient();
   const [phase, setPhase] = React.useState<Phase>("intro");
   const [dimResults, setDimResults] = React.useState<DimensionResult[] | null>(null);
   const [saving, setSaving] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
 
   const handleComplete = async (answers: Record<string, string>) => {
     const results = computeGapAnalysis(answers);
@@ -488,6 +491,11 @@ export default function ManagementReadiness() {
         },
         body: JSON.stringify({ answers, dimensionResults: results }),
       });
+      setSaved(true);
+      // Immediately update all related queries so dashboard + assess listing + journey reflect this
+      queryClient.invalidateQueries({ queryKey: ["/api/assessments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/journey"] });
     } catch (err) {
       console.error("Failed to save results", err);
     } finally {
@@ -515,10 +523,25 @@ export default function ManagementReadiness() {
   if (phase === "results" && dimResults) {
     return (
       <div className="py-4">
+        {/* Save confirmation banner */}
+        {(saving || saved) && (
+          <div className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-xl mb-4 text-sm font-medium border transition-all",
+            saving
+              ? "bg-primary/10 border-primary/20 text-primary animate-pulse"
+              : "bg-green-500/10 border-green-500/20 text-green-400"
+          )}>
+            {saving ? (
+              <><SaveAll className="w-4 h-4" /> Saving your results...</>
+            ) : (
+              <><CheckCircle2 className="w-4 h-4" /> Results saved — your progress is tracked on the Dashboard and Journey</>
+            )}
+          </div>
+        )}
         <GapResults
           dimResults={dimResults}
-          onRetake={() => { setDimResults(null); setPhase("taking"); }}
-          onBack={() => { setDimResults(null); setPhase("intro"); }}
+          onRetake={() => { setDimResults(null); setSaved(false); setPhase("taking"); }}
+          onBack={() => { setDimResults(null); setSaved(false); setPhase("intro"); }}
         />
       </div>
     );

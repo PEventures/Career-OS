@@ -4,6 +4,7 @@ import { Card, CardContent, Badge, Button } from "@/components/ui/shared";
 import { BookOpen, ChevronRight, Lock, Filter } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
+import { UpgradeModal } from "@/components/ui/UpgradeModal";
 
 const CATEGORIES = ["All", "Communication", "Performance", "Politics", "Visibility", "Conflict"];
 const ICONS: Record<string, string> = {
@@ -13,6 +14,7 @@ const ICONS: Record<string, string> = {
 export default function Systems() {
   const { data: systems, isLoading } = useListSystems();
   const [filter, setFilter] = React.useState("All");
+  const [upgradeTarget, setUpgradeTarget] = React.useState<{ name: string; description: string } | null>(null);
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading playbooks...</div>;
 
@@ -31,7 +33,6 @@ export default function Systems() {
         </p>
       </div>
 
-      {/* Category Filter */}
       <div className="flex items-center gap-2 flex-wrap">
         <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
         {CATEGORIES.map(cat => (
@@ -56,10 +57,31 @@ export default function Systems() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filtered.map((system: any) => (
-          <Card key={system.id} className="group relative overflow-hidden flex flex-col hover:border-white/20 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+          <Card
+            key={system.id}
+            className={cn(
+              "group relative overflow-hidden flex flex-col transition-all duration-300",
+              system.isPremium
+                ? "border-amber-500/20 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/5 cursor-pointer"
+                : "hover:border-white/20 hover:shadow-lg hover:shadow-primary/5 cursor-pointer"
+            )}
+            onClick={() => {
+              if (system.isPremium) {
+                setUpgradeTarget({ name: system.title, description: system.description });
+              }
+            }}
+          >
+            {system.isPremium && (
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none" />
+            )}
             <CardContent className="p-6 md:p-8 flex flex-col h-full">
               <div className="flex justify-between items-start mb-6">
-                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl group-hover:scale-110 group-hover:bg-primary/10 transition-all">
+                <div className={cn(
+                  "w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all",
+                  system.isPremium
+                    ? "bg-amber-500/10 group-hover:bg-amber-500/20 group-hover:scale-110"
+                    : "bg-secondary group-hover:scale-110 group-hover:bg-primary/10"
+                )}>
                   {ICONS[system.category] || "📋"}
                 </div>
                 <div className="flex items-center gap-2">
@@ -72,7 +94,12 @@ export default function Systems() {
               </div>
 
               <Badge variant="outline" className="w-fit mb-4 text-[10px] uppercase tracking-wider">{system.category}</Badge>
-              <h3 className="text-xl font-display font-bold mb-3 group-hover:text-primary transition-colors">{system.title}</h3>
+              <h3 className={cn(
+                "text-xl font-display font-bold mb-3 transition-colors",
+                system.isPremium ? "group-hover:text-amber-400" : "group-hover:text-primary"
+              )}>
+                {system.title}
+              </h3>
               <p className="text-muted-foreground leading-relaxed mb-6 flex-1 text-sm">
                 {system.description}
               </p>
@@ -83,16 +110,43 @@ export default function Systems() {
                 {(system.scripts || []).length > 0 && <span>{(system.scripts || []).length} scripts</span>}
               </div>
 
-              <Link href={`/systems/${system.id}`}>
-                <Button variant="outline" className="w-full justify-between group-hover:bg-primary/10 group-hover:border-primary/30 group-hover:text-primary border-white/10 transition-all">
-                  View Full Playbook
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              {system.isPremium ? (
+                <Button
+                  variant="outline"
+                  className="w-full justify-between border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setUpgradeTarget({ name: system.title, description: system.description });
+                  }}
+                >
+                  <span className="flex items-center gap-2">
+                    <Lock className="w-4 h-4" /> Unlock Playbook
+                  </span>
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
-              </Link>
+              ) : (
+                <Link href={`/systems/${system.id}`} onClick={e => e.stopPropagation()}>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between group-hover:bg-primary/10 group-hover:border-primary/30 group-hover:text-primary border-white/10 transition-all"
+                  >
+                    View Full Playbook
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </Button>
+                </Link>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {upgradeTarget && (
+        <UpgradeModal
+          onClose={() => setUpgradeTarget(null)}
+          featureName={upgradeTarget.name}
+          featureDescription={upgradeTarget.description}
+        />
+      )}
     </div>
   );
 }
