@@ -1,0 +1,198 @@
+Here’s the revised version with the final section removed:
+
+---
+
+## 🔥 AI PRODUCT IMPROVEMENT PROMPT
+
+**Objective:**
+Refine and improve a management training app designed for **aspiring and new managers (0–2 years experience)**. The goal is to increase clarity, engagement, conversion, and usability.
+
+---
+
+## 🧠 1. LANDING PAGE – CLARITY & POSITIONING
+
+**Problem:**
+Users do not understand what the product is at first glance.
+
+**Fix Required:**
+Rework the landing page messaging to clearly communicate:
+
+* This tool is for:
+
+  * New managers
+  * Aspiring leaders
+  * Individual contributors stepping into leadership
+
+**Core Value Proposition (Must be obvious in 3 seconds):**
+
+* “Your AI-powered management coach in your pocket”
+
+**Messaging Direction:**
+
+* Replace ambiguity with direct comparison:
+
+  * Instead of spending **$1000s on coaching**
+  * Or **100+ hours reading management books**
+  * This tool gives you **real-world management guidance instantly**
+
+**Add:**
+
+* Clear headline + subheadline
+* “What this tool does” in 1–2 lines
+* Real-world scenarios emphasis
+
+---
+
+## 🚀 2. ONBOARDING EXPERIENCE
+
+**Problem:**
+Onboarding lacks guidance and clarity.
+
+**Fix Required:**
+
+* Introduce a **Digital Avatar Guide** that walks the user through:
+
+### Onboarding Flow:
+
+1. Welcome
+2. What to expect
+3. High-level journey:
+
+* Assessment → Gap Analysis → Scenario Simulation → Skill Progression
+
+**Goal:**
+Make the user feel:
+
+* Guided
+* Supported
+* Clear on what happens next
+
+---
+
+## 📊 3. ASSESSMENT MODULE
+
+**Problem:**
+Assessment results do not save. Users lose progress when navigating back.
+
+**Fix Required:**
+
+* Save:
+
+  * Assessment progress
+  * Completed results
+  * Historical reports
+
+**Add:**
+
+* “Resume where you left off”
+* Assessment history dashboard
+
+---
+
+## 💰 4. PRICING & PAYWALL FLOW
+
+**Problems:**
+
+* Clicking locked features does not trigger payment flow
+* Promo code (FREE26) does not unlock premium
+
+**Fix Required:**
+
+* When user clicks premium feature:
+  → Trigger paywall modal immediately
+
+* Ensure:
+
+  * Promo code logic works
+  * Unlocks features in real-time
+
+**Goal:**
+
+* Smooth upgrade experience
+* No friction or confusion
+
+---
+
+## 🛠️ 5. ADMIN DASHBOARD (CRITICAL FOR SCALE)
+
+**Requirement:**
+Build a backend admin panel with visibility into:
+
+### Key Metrics:
+
+* Active users
+* Daily / weekly usage
+* Feature engagement (what users actually use)
+* Drop-off points
+* Most used scenarios
+
+### Strategic Value:
+
+* Identify product-market fit signals
+* Extract insights for:
+
+  * Internal optimization
+  * Selling data insights to companies (future opportunity)
+
+---
+
+## 🧭 6. JOURNEY DASHBOARD (CORE UX FIX)
+
+**Problem:**
+Current structure is time-based (weeks), which reduces engagement.
+
+**Fix Required:**
+
+### Replace:
+
+❌ Week-based progression
+✔ Badge-based progression
+
+### New Structure:
+
+* Group content by **skill badges**, not time
+
+**Examples:**
+
+* Communication Mastery
+* Conflict Resolution
+* Performance Management
+* Leadership Presence
+
+**Goal:**
+
+* Make progression feel:
+
+  * Achievement-based
+  * Flexible
+  * Gamified
+
+---
+
+## 🎮 7. SCENARIO SIMULATOR
+
+**Problems:**
+
+* Filters are not working
+* No level-based progression
+
+**Fix Required:**
+
+### Functional Fix:
+
+* Repair filters so users can sort scenarios properly
+
+### Add Levels:
+
+* Intermediate
+* Director
+* Executive
+
+**Goal:**
+
+* Allow users to:
+
+  * Progress in complexity
+  * Feel growth over time
+
+---

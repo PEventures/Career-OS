@@ -20,6 +20,7 @@ import BrandLab from "@/pages/app/BrandLab";
 import SystemDetail from "@/pages/app/SystemDetail";
 import ManagementReadiness from "@/pages/app/ManagementReadiness";
 import Pricing from "@/pages/app/Pricing";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
 
 // Layout
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -92,6 +93,9 @@ function Router() {
       </Route>
       <Route path="/pricing">
         {() => <ProtectedRoute component={() => <AppLayout><Pricing /></AppLayout>} />}
+      </Route>
+      <Route path="/admin">
+        {() => <ProtectedRoute component={AdminDashboard} />}
       </Route>
 
       <Route component={NotFound} />
