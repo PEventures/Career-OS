@@ -145,6 +145,27 @@ router.post("/login", async (req, res) => {
   });
 });
 
+const PROMO_CODES: Record<string, string> = {
+  "FREE26": "premium",
+  "STANDOUT50": "premium",
+};
+
+router.post("/upgrade", requireAuth, async (req: any, res) => {
+  const { code } = req.body;
+  const upper = (code || "").trim().toUpperCase();
+  const newTier = PROMO_CODES[upper];
+  if (!newTier) {
+    return res.status(400).json({ error: "Invalid promo code" });
+  }
+  if (req.user.tier === newTier || req.user.tier === "premium") {
+    return res.json({ success: true, tier: req.user.tier, alreadyUpgraded: true });
+  }
+  await db.update(usersTable)
+    .set({ tier: newTier, updatedAt: new Date() })
+    .where(eq(usersTable.id, req.user.id));
+  res.json({ success: true, tier: newTier });
+});
+
 router.post("/logout", requireAuth, async (req: any, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.slice(7);
