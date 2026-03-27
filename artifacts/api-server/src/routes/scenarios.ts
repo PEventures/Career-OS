@@ -37,6 +37,7 @@ router.get("/", requireAuth, async (req: any, res) => {
       isCompleted: !!completion,
       userScore: completion?.score || null,
       isPremium: s.isPremium,
+      isLocked: isLocked,
     };
   });
 

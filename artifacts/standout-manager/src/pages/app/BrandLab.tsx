@@ -1,9 +1,11 @@
 import React from "react";
+import { useLocation } from "wouter";
 import { useGetBrandProfile } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Progress } from "@/components/ui/shared";
 import { ShieldAlert, TrendingUp, Search } from "lucide-react";
 
 export default function BrandLab() {
+  const [, navigate] = useLocation();
   const { data: profile, isLoading } = useGetBrandProfile();
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading brand data...</div>;
@@ -46,8 +48,8 @@ export default function BrandLab() {
               <p className="text-muted-foreground text-sm">Your brand equity is growing, but there is a gap between how you work and how you are perceived by leadership.</p>
             </div>
             <div className="mt-8 flex gap-3">
-              <Button variant="premium" size="sm">Log Brand Event</Button>
-              <Button variant="outline" size="sm">Take Perception Audit</Button>
+              <Button variant="premium" size="sm" onClick={() => navigate("/assess")}>Log Brand Event</Button>
+              <Button variant="outline" size="sm" onClick={() => navigate("/assess")}>Take Perception Audit</Button>
             </div>
           </CardContent>
         </Card>

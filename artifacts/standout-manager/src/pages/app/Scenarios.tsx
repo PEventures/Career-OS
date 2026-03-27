@@ -100,12 +100,12 @@ export default function Scenarios() {
               key={scenario.id}
               className={cn(
                 "group relative overflow-hidden flex flex-col h-full transition-colors cursor-pointer",
-                scenario.isPremium
+                (scenario as any).isLocked
                   ? "border-amber-500/20 hover:border-amber-500/40"
                   : "hover:border-primary/50"
               )}
               onClick={() => {
-                if (scenario.isPremium) {
+                if ((scenario as any).isLocked) {
                   setUpgradeTarget({ name: scenario.title, description: scenario.description });
                 }
               }}
@@ -115,7 +115,7 @@ export default function Scenarios() {
                   <Badge variant="secondary" className="bg-green-500/20 text-green-400">Completed</Badge>
                 </div>
               )}
-              {scenario.isPremium && (
+              {(scenario as any).isLocked && (
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none" />
               )}
               <CardContent className="p-6 flex-1 flex flex-col">
@@ -132,7 +132,7 @@ export default function Scenarios() {
                 </div>
                 <h3 className={cn(
                   "text-lg font-bold mb-2 transition-colors leading-snug",
-                  scenario.isPremium ? "group-hover:text-amber-400" : "group-hover:text-primary"
+                  (scenario as any).isLocked ? "group-hover:text-amber-400" : "group-hover:text-primary"
                 )}>
                   {scenario.title}
                 </h3>
@@ -145,7 +145,7 @@ export default function Scenarios() {
                     <Clock className="w-3.5 h-3.5 mr-1.5" />
                     {scenario.estimatedMinutes} min
                   </div>
-                  {scenario.isPremium ? (
+                  {(scenario as any).isLocked ? (
                     <Button
                       variant="outline"
                       size="sm"

@@ -15,17 +15,21 @@ router.get("/", requireAuth, async (req: any, res) => {
   }
 
   const isFreeTier = req.user.tier === "free";
-  const response = systems.map((s) => ({
-    id: s.id,
-    title: s.title,
-    description: s.description,
-    category: s.category,
-    estimatedMinutes: s.estimatedMinutes,
-    steps: s.isPremium && isFreeTier ? (s.steps as any[]).slice(0, 2) : s.steps,
-    keyPrinciples: s.isPremium && isFreeTier ? (s.keyPrinciples as any[]).slice(0, 2) : s.keyPrinciples,
-    scripts: s.isPremium && isFreeTier ? [] : s.scripts,
-    isPremium: s.isPremium,
-  }));
+  const response = systems.map((s) => {
+    const isLocked = s.isPremium && isFreeTier;
+    return {
+      id: s.id,
+      title: s.title,
+      description: s.description,
+      category: s.category,
+      estimatedMinutes: s.estimatedMinutes,
+      steps: isLocked ? (s.steps as any[]).slice(0, 2) : s.steps,
+      keyPrinciples: isLocked ? (s.keyPrinciples as any[]).slice(0, 2) : s.keyPrinciples,
+      scripts: isLocked ? [] : s.scripts,
+      isPremium: s.isPremium,
+      isLocked,
+    };
+  });
 
   res.json(response);
 });

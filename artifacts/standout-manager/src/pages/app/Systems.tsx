@@ -61,24 +61,24 @@ export default function Systems() {
             key={system.id}
             className={cn(
               "group relative overflow-hidden flex flex-col transition-all duration-300",
-              system.isPremium
+              system.isLocked
                 ? "border-amber-500/20 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/5 cursor-pointer"
                 : "hover:border-white/20 hover:shadow-lg hover:shadow-primary/5 cursor-pointer"
             )}
             onClick={() => {
-              if (system.isPremium) {
+              if (system.isLocked) {
                 setUpgradeTarget({ name: system.title, description: system.description });
               }
             }}
           >
-            {system.isPremium && (
+            {system.isLocked && (
               <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none" />
             )}
             <CardContent className="p-6 md:p-8 flex flex-col h-full">
               <div className="flex justify-between items-start mb-6">
                 <div className={cn(
                   "w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all",
-                  system.isPremium
+                  system.isLocked
                     ? "bg-amber-500/10 group-hover:bg-amber-500/20 group-hover:scale-110"
                     : "bg-secondary group-hover:scale-110 group-hover:bg-primary/10"
                 )}>
@@ -96,7 +96,7 @@ export default function Systems() {
               <Badge variant="outline" className="w-fit mb-4 text-[10px] uppercase tracking-wider">{system.category}</Badge>
               <h3 className={cn(
                 "text-xl font-display font-bold mb-3 transition-colors",
-                system.isPremium ? "group-hover:text-amber-400" : "group-hover:text-primary"
+                system.isLocked ? "group-hover:text-amber-400" : "group-hover:text-primary"
               )}>
                 {system.title}
               </h3>
@@ -110,7 +110,7 @@ export default function Systems() {
                 {(system.scripts || []).length > 0 && <span>{(system.scripts || []).length} scripts</span>}
               </div>
 
-              {system.isPremium ? (
+              {system.isLocked ? (
                 <Button
                   variant="outline"
                   className="w-full justify-between border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all"
